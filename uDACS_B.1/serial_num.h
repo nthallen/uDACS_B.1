@@ -16,9 +16,22 @@
 #include "uDACS_pins.h"
 
 // These parameters are common to all boards built with this code
-#define SUBBUS_BOARD_FIRMWARE_REV "V1.8"
-#define SUBBUS_BOARD_BUILD_NUM 13
+#define SUBBUS_BOARD_FIRMWARE_REV "V2.0"
+#define SUBBUS_BOARD_BUILD_NUM 14
 #define HAVE_RTC
+
+// This repository is specific to uDACS Rev B.1
+// The .1 version differs from earlier uses of Rev B due to
+// different components being installed and different components
+// connected remotely, both requiring changes to the START
+// definition. As of 5/30/23, we have decided that START
+// changes warrant a separate repository.
+//
+// We will maintain unique SN values for all Rev B boards.
+#define SUBBUS_SUBFUNCTION 14 // uDACS Rev B
+#define SUBBUS_SUBFUNCTION_HEX E // 14 in hex
+#define SUBBUS_BOARD_ID 3 // B.1
+#define SUBBUS_BOARD_BOARD_REV "Rev B.1"
 
 /**
  * Build definitions
@@ -29,61 +42,17 @@
 #endif
 
 #if ! defined(SUBBUS_SUBFUNCTION)
-// subfunction should be either 9 for Rev A or 14 for Rev B
+// subfunction should be 14 for Rev B
 #error Must define SUBBUS_SUBFUNCTION
 #endif
 
-#if SUBBUS_SUBFUNCTION == 9 // uDACS Rev A
-  #define SUBBUS_BOARD_BOARD_REV "Rev A"
-
-  #if SUBBUS_BOARD_SN == 1
-    #define SUBBUS_BOARD_INSTRUMENT_ID 7
-    #define SUBBUS_BOARD_INSTRUMENT "DPOPS"
-    #define SUBBUS_BOARD_ID 1
-    #define SUBBUS_BOARD_BOARD_TYPE "uDACS A"
-  #endif
-#elif SUBBUS_SUBFUNCTION == 14 // uDACS Rev B
-  #define SUBBUS_SUBFUNCTION_HEX E
-  #define SUBBUS_BOARD_BOARD_REV "Rev B"
-
-  #if SUBBUS_BOARD_SN == 1
-    #define SUBBUS_BOARD_INSTRUMENT_ID 7
-    #define SUBBUS_BOARD_INSTRUMENT "DPOPS"
-    #define SUBBUS_BOARD_ID 1
-    #define SUBBUS_BOARD_BOARD_TYPE "uDACS A"
-    #define SB_FAIL_PIN SPR7
-    #define SB_FAIL_PIN2 SPR29
-    // #define SB_FAIL_TIMEOUT_SECS 20
-  #endif
-
-  #if SUBBUS_BOARD_SN == 2
-  #define SUBBUS_BOARD_INSTRUMENT_ID 7
-  #define SUBBUS_BOARD_INSTRUMENT "DPOPS"
-  #define SUBBUS_BOARD_ID 2
-  #define SUBBUS_BOARD_BOARD_TYPE "uDACS B"
-  #define uDACS_B
-  #endif
-
-  #if SUBBUS_BOARD_SN == 3
-  #define SUBBUS_BOARD_INSTRUMENT_ID 7
-  #define SUBBUS_BOARD_INSTRUMENT "DPOPS"
-  #define SUBBUS_BOARD_ID 2
-  #define SUBBUS_BOARD_BOARD_TYPE "uDACS B"
-  #define uDACS_B
-  #endif
-
-  #if SUBBUS_BOARD_SN == 4
-  #define SUBBUS_BOARD_INSTRUMENT_ID 7
-  #define SUBBUS_BOARD_INSTRUMENT "DPOPS"
-  #define SUBBUS_BOARD_ID 2
-  #define SUBBUS_BOARD_BOARD_TYPE "uDACS B"
-  #define uDACS_B
-  #endif
+// Serial Numbers 1 through 4 are on board IDs 1 and 2
+// Their firmware is in another repository
+#if SUBBUS_SUBFUNCTION == 14
 
   #if SUBBUS_BOARD_SN == 5
   #define SUBBUS_BOARD_INSTRUMENT_ID 10
   #define SUBBUS_BOARD_INSTRUMENT "FOCAL"
-  #define SUBBUS_BOARD_ID 3
   #define SUBBUS_BOARD_BOARD_TYPE "OE uDACS"
   #define SUBBUS_BOARD_LOCATION "CO2"
 //  #define uDACS_B	// Need this out to disable spi_ps.c/.h
@@ -130,28 +99,15 @@
 #endif
 
 #ifndef SUBBUS_BOARD_LOCATION
-  #define SUBBUS_BOARD_LOCATION "DPOPS"
+  #error SUBBUS_BOARD_LOCATION not defined
 #endif
-
-#ifdef uDACS_B
-  #define PS_MOSI PMOD1
-  #define PS_MISO PMOD7
-  #define PS_SCLK PMOD5
-  #define ADC1_CS PMOD8
-  #define EEP1_CS PMOD4
-  #define ADC2_CS PMOD6
-  #define EEP2_CS PMOD2
-  #define ADC3_CS SPR_AO
-  #define EEP3_CS PMOD3
-  #define PPMP_CNTL SPR7
-  #define BPMP_CNTL SPR29
-  #define PPMPS   UC_SCL
-  #define BPMPS   UC_SDA
-#endif
-
 
 #ifndef SUBBUS_SUBFUNCTION_HEX
+#if SUBBUS_SUBFUNCTION >= 10
+#error SUBBUS_SUBFUNCTION_HEX must be defined for SUBFUNC values >= 10
+#else
 #define SUBBUS_SUBFUNCTION_HEX SUBBUS_SUBFUNCTION
+#endif
 #endif
 
 #ifdef CAN_BOARD_ID
